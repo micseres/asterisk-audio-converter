@@ -1,11 +1,17 @@
 from pydub import AudioSegment
+from pydub.exceptions import (
+    CouldntDecodeError,
+    CouldntEncodeError
+)
 from flask import Flask, Response
 from flask_cors import CORS
 import re
 import os
 from dotenv import load_dotenv
 import urllib.request
+from urllib.error import URLError, HTTPError
 import io
+import json
 
 dirname = os.path.dirname(__file__)
 
@@ -30,13 +36,24 @@ def build_url(name):
 def audio(name):
     import_buf = io.BytesIO()
 
-    with urllib.request.urlopen(build_url(name)) as url:
-        import_buf.write(url.read())
+    try:
+        with urllib.request.urlopen(build_url(name)) as url:
+            import_buf.write(url.read())
+    except HTTPError:
+        return Response(json.dumps({'error': 'Connection to audio server failed'}), mimetype="application/json", status=401)
+    except URLError:
+        return Response(json.dumps({'error': 'File name incorrect'}), mimetype="application/json", status=401)
 
-    song = AudioSegment.from_file(import_buf, format="wav")
+    try:
+        song = AudioSegment.from_file(import_buf, format="wav")
+    except CouldntDecodeError:
+        return Response(json.dumps({'error': 'File can`t decode'}), mimetype="application/json", status=401)
 
-    export_buf = io.BytesIO()
-    song.export(export_buf, format="mp3")
+    try:
+        export_buf = io.BytesIO()
+        song.export(export_buf, format="mp3")
+    except CouldntDecodeError:
+        return Response(json.dumps({'error': 'File can`t encode'}), mimetype="application/json", status=401)
 
     def generate():
         with export_buf as fwav:
