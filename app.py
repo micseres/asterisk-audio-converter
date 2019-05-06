@@ -40,20 +40,20 @@ def audio(name):
         with urllib.request.urlopen(build_url(name)) as url:
             import_buf.write(url.read())
     except HTTPError:
-        return Response(json.dumps({'error': 'Connection to audio server failed'}), mimetype="application/json", status=401)
+        return Response(json.dumps({'error': 'Connect to audio server failed'}), mimetype="application/json", status=422)
     except URLError:
-        return Response(json.dumps({'error': 'File name incorrect'}), mimetype="application/json", status=401)
+        return Response(json.dumps({'error': 'File name incorrect'}), mimetype="application/json", status=404)
 
     try:
         song = AudioSegment.from_file(import_buf, format="wav")
     except CouldntDecodeError:
-        return Response(json.dumps({'error': 'File can`t decode'}), mimetype="application/json", status=401)
+        return Response(json.dumps({'error': 'File can`t decode'}), mimetype="application/json", status=415)
 
     try:
         export_buf = io.BytesIO()
         song.export(export_buf, format="mp3")
     except CouldntDecodeError:
-        return Response(json.dumps({'error': 'File can`t encode'}), mimetype="application/json", status=401)
+        return Response(json.dumps({'error': 'File can`t encode'}), mimetype="application/json", status=422)
 
     def generate():
         with export_buf as fwav:
