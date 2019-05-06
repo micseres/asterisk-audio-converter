@@ -9,6 +9,7 @@ itsdangerous==1.1.0
 Jinja2==2.10.1
 MarkupSafe==1.1.1
 multidict==4.5.2
+pathlib==1.0.1
 pkg-resources==0.0.0
 pydub==0.23.1
 python-dotenv==0.10.1
