@@ -57,12 +57,18 @@ def audio(name):
 
     def generate():
         with export_buf as fwav:
-            data = fwav.read(1024)
+            data = fwav.read(4096)
             while data:
                 yield data
-                data = fwav.read(1024)
+                data = fwav.read(4096)
 
-    return Response(generate(), mimetype="audio/mpeg")
+    return Response(generate(), mimetype="audio/mp3", headers={
+        'Accept-Ranges': 'bytes',
+        'disposition': 'inline',
+        'stream': True,
+        'buffer_size': 4096,
+        'Content-length': len(export_buf.getvalue())
+    })
 
 
 if __name__ == "__main__":
