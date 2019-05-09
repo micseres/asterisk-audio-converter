@@ -53,7 +53,8 @@ def audio(name):
         export_buf = io.BytesIO()
         song.export(export_buf, format="mp3")
     except CouldntEncodeError as e:
-        return Response(json.dumps(e), mimetype="application/json", status=422)
+        raise e
+        #return Response(json.dumps({'error': 'File can`t encode'}), mimetype="application/json", status=422)
 
     def generate():
         with export_buf as fwav:
