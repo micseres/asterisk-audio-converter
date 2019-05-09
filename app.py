@@ -46,14 +46,14 @@ def audio(name):
 
     try:
         song = AudioSegment.from_file(import_buf, format="wav")
-    except CouldntDecodeError as e:
-        return Response(json.dumps(e), mimetype="application/json", status=415)
+    except CouldntDecodeError:
+        return Response(json.dumps({'error': 'File can`t decode'}), mimetype="application/json", status=415)
 
     try:
         export_buf = io.BytesIO()
         song.export(export_buf, format="mp3")
-    except CouldntEncodeError:
-        return Response(json.dumps({'error': 'File can`t encode'}), mimetype="application/json", status=422)
+    except CouldntEncodeError as e:
+        return Response(json.dumps(e), mimetype="application/json", status=422)
 
     def generate():
         with export_buf as fwav:
