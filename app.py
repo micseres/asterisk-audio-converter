@@ -46,8 +46,8 @@ def audio(name):
 
     try:
         song = AudioSegment.from_file(import_buf, format="wav")
-    except CouldntDecodeError:
-        return Response(json.dumps({'error': 'File can`t decode'}), mimetype="application/json", status=415)
+    except CouldntDecodeError as e:
+        return Response(json.dumps(e), mimetype="application/json", status=415)
 
     try:
         export_buf = io.BytesIO()
