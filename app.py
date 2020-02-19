@@ -23,13 +23,14 @@ SECRET_KEY = os.getenv('APP_SECRET_KEY')
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 app.config.from_object(__name__)
-reg_exp = re.compile('(^\w+-\w+-\w+-)(\d{4})(\d{2})(\d{2})(.+)')
+reg_exp = re.compile('(?:^\w+-\w+-(?:\+|)\w+-)(\d{4})(\d{2})(\d{2})(?:.+)')
 abs_url = os.getenv('APP_AUDIO_SERVER_URL')
 
 
 def build_url(name):
     matches = re.match(reg_exp, name)
-    return abs_url + '/' + matches[2] + '/' + matches[3] + '/' + matches[4] + '/' + name
+
+    return abs_url + '/' + matches[1] + '/' + matches[2] + '/' + matches[3] + '/' + name
 
 
 @app.route("/audio/<string:name>", methods=['GET'])
